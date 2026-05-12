@@ -802,14 +802,21 @@
         async function carregarCategorias() {
             try {
                 const response = await fetch(`${API_URL}/categorias`);
+                if (!response.ok) {
+                    throw new Error(`Falha ao carregar categorias: ${response.status} ${response.statusText}`);
+                }
                 categoriasData = await response.json();
                 renderizarBotoesCategorias();
                 if (categoriasData.length > 0) {
                     selecionarCategoria(categoriasData[0].id, categoriasData[0].nome);
+                } else {
+                    navCategorias.innerHTML = '<p style="color:#999; font-weight:700;">Nenhuma categoria disponível.</p>';
                 }
             } catch (error) {
                 console.error('Erro ao carregar categorias:', error);
-                navCategorias.innerHTML = '<p style="color:var(--vermelho); font-weight:700;">Erro ao carregar menu. Tente novamente!</p>';
+                navCategorias.innerHTML = '<p style="color:var(--vermelho); font-weight:700;">Erro ao carregar menu. Verifique o backend.</p>';
+                listaProdutos.innerHTML = '';
+                categoriaTitulo.innerText = 'Não foi possível carregar o cardápio.';
             }
         }
 
@@ -845,11 +852,14 @@
             listaProdutos.innerHTML = '<div style="grid-column:1/-1;"><div class="spinner"></div></div>';
             try {
                 const response = await fetch(`${API_URL}/produtos?categoriaId=${categoriaId}`);
+                if (!response.ok) {
+                    throw new Error(`Falha ao carregar produtos: ${response.status} ${response.statusText}`);
+                }
                 const produtos = await response.json();
                 renderizarProdutos(produtos);
             } catch (error) {
                 console.error('Erro ao carregar produtos:', error);
-                listaProdutos.innerHTML = '<p style="grid-column:1/-1; color:var(--vermelho); font-weight:700; padding:20px 0;">Erro ao carregar produtos.</p>';
+                listaProdutos.innerHTML = '<p style="grid-column:1/-1; color:var(--vermelho); font-weight:700; padding:20px 0;">Erro ao carregar produtos. Verifique o backend.</p>';
             }
         }
 
